@@ -1,0 +1,40 @@
+#Steps to add Resque Scheduler and Resque working in parallel 
+
+1. Add to your Gemfile
+   
+   gem "resque", require: "resque/server"
+   gem 'resque-scheduler'
+
+2. Add to your config/routes.rb
+   
+    require 'resque/scheduler/server'
+    mount Resque::Server, :at => "/resque"   
+
+3. Add to your config/initializers/resque.rb 
+
+   Resque::Server.use(Rack::Auth::Basic) do |user, password|
+    user = "admin"
+    password == "123qweAadmin"
+   end
+
+   Resque::Scheduler.dynamic = true
+
+4. Add to your lib/tasks/resque.rake
+
+   require "resque/tasks"
+   require 'resque/scheduler/tasks'
+
+   task "resque:setup" => :environment
+
+5. Start the workers and schedulers from terminal
+
+   rake resque:work QUEUE="*" BACKGROUND=yes
+   rake resque:scheduler BACKGROUND=yes
+
+6. visit browser http://localhost/resque
+
+   Confirm if following tabs have appeared
+   Overview | working | Failed | Queues | Workers | Stats | Schedule | Delayed 	
+   
+ 
+  All set!!!! :)
